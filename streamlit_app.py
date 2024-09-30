@@ -40,3 +40,11 @@ option = st.selectbox(
     "Which category would you like?",
     ("Furniture", "Office Supplies", "Technology"),
 )
+
+options = st.multiselect(
+    "What is the subcategory?",
+    ["Chairs", "Tables", "Binders", "Accessories"],
+    ["Bookcase", "Furnishings", "Envelopes", "Art", "Papers", "Phones"],
+)
+
+st.write("You selected:", options)
