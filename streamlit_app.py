@@ -43,8 +43,7 @@ option = st.selectbox(
 
 options = st.multiselect(
     "What is the subcategory?",
-    ["Chairs", "Tables", "Binders", "Accessories"],
-    ["Bookcase", "Furnishings", "Envelopes", "Art", "Papers", "Phones"],
+    ["Chairs", "Tables", "Binders", "Accessories","Bookcase", "Furnishings", "Envelopes", "Art", "Papers", "Phones"],
 )
 
 st.write("You selected:", options)
