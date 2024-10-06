@@ -36,16 +36,50 @@ st.write("### (3) show a line chart of sales for the selected items in (2)")
 st.write("### (4) show three metrics (https://docs.streamlit.io/library/api-reference/data/st.metric) for the selected items in (2): total sales, total profit, and overall profit margin (%)")
 st.write("### (5) use the delta option in the overall profit margin metric to show the difference between the overall average profit margin (all products across all categories)")
 
-option = st.selectbox(
+# (1) Add a dropdown for Category
+category = st.selectbox(
     "Which category would you like?",
-    ("Furniture", "Office Supplies", "Technology"),
+    df["Category"].unique()
 )
 
-options = st.multiselect(
+# Filter the dataframe based on the selected category
+filtered_df = df[df["Category"] == category]
+
+# (2) Add a multi-select for Sub_Category in the selected Category
+sub_categories = filtered_df["Sub-Category"].unique()
+selected_sub_categories = st.multiselect(
     "What is the subcategory?",
-    ["Chairs", "Tables", "Binders", "Accessories","Bookcase", "Furnishings", "Envelopes", "Art", "Papers", "Phones"],
+    sub_categories
 )
 
-st.write("You selected:", options)
+# Filter the dataframe based on the selected sub-categories
+filtered_sub_df = filtered_df[filtered_df["Sub-Category"].isin(selected_sub_categories)]
+
+# (3) Show a line chart of sales for the selected items in (2)
+if not filtered_sub_df.empty:
+    sales_by_month_sub = filtered_sub_df.filter(items=['Sales']).groupby(pd.Grouper(freq='M')).sum()
+    st.line_chart(sales_by_month_sub, y="Sales")
+
+# (4) Show three metrics for the selected items in (2)
+if not filtered_sub_df.empty:
+    total_sales = filtered_sub_df["Sales"].sum()
+    total_profit = filtered_sub_df["Profit"].sum()
+    overall_profit_margin = (total_profit / total_sales) * 100
+
+    st.metric("Total Sales", f"${total_sales:,.2f}")
+    st.metric("Total Profit", f"${total_profit:,.2f}")
+    st.metric("Overall Profit Margin (%)", f"{overall_profit_margin:.2f}%")
+
+    # (5) Use the delta option to show the difference between the overall average profit margin and the profit margin of the selected items
+    overall_total_sales = df["Sales"].sum()
+    overall_total_profit = df["Profit"].sum()
+    overall_avg_profit_margin = (overall_total_profit / overall_total_sales) * 100
+
+    delta = overall_profit_margin - overall_avg_profit_margin
+    st.metric("Overall Profit Margin (%)", f"{overall_profit_margin:.2f}%", delta=f"{delta:.2f}%")
+else:
+    st.write("No data available for the selected sub-categories.")
+
+st.write("You selected:", selected_sub_categories)
 
 
