@@ -60,10 +60,10 @@ st.write(filtered_data)
 # 3 - Line chart of sales for selected sub-categories
 # Section: Sales Trend Visualization
 st.write("### Sales Trend Visualization")
-if not df_final.empty:
-    df_final["Order_Date"] = pd.to_datetime(df_final["Order_Date"])
-    df_final.set_index('Order_Date', inplace=True)
-    sales_by_month_filtered = df_final.filter(items=['Sales']).groupby(pd.Grouper(freq='M')).sum()
+if not filtered_data.empty:
+    filtered_data["Order_Date"] = pd.to_datetime(filtered_data["Order_Date"])
+    filtered_data.set_index('Order_Date', inplace=True)
+    sales_by_month_filtered = filtered_data.filter(items=['Sales']).groupby(pd.Grouper(freq='M')).sum()
     st.line_chart(sales_by_month_filtered, y="Sales")
 
 
