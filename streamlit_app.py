@@ -54,16 +54,7 @@ st.write("You selected:", options)
 # Filter the data based on selected category and subcategories
 filtered_data = df[(df['Category'] == option) & (df['Sub_Category'].isin(options))]
 
-# Question 3: Line chart of sales for the selected subcategories
-if not filtered_data.empty:
-    # Group data by Order_Date (monthly) and sum sales for each subcategory
-    filtered_sales_by_month = filtered_data.groupby([pd.Grouper(key='Order_Date', freq='M'), 'Sub_Category'])['Sales'].sum().unstack().fillna(0)
 
-    # Plot the line chart for selected subcategories
-    st.write(f"### Sales over time for selected subcategories: {', '.join(options)}")
-    st.line_chart(filtered_sales_by_month)
-else:
-    st.write("Please select at least one subcategory to view the data.")
 
 
 
