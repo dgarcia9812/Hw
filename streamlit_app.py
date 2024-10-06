@@ -50,7 +50,7 @@ st.write("You selected:", options)
 
 
   # (3) Show a line chart of sales for the selected items in (2)
-    if options:
+if options:
         filtered_sub_df = filtered_df[filtered_df["Sub-Category"].isin(options)]
         if not filtered_sub_df.empty:
             sales_by_month_sub = filtered_sub_df.filter(items=['Sales']).groupby(pd.Grouper(freq='MS')).sum()
