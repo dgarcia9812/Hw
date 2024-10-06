@@ -72,6 +72,16 @@ if not filtered_data.empty:
     st.metric("Total Profit", f"${total_profit:,.2f}")
     st.metric("Profit Margin (%)", f"{profit_margin:.2f}%")
 
+    # 5 - Overall profit margin and delta
+    overall_sales = df['Sales'].sum()
+    overall_profit = df['Profit'].sum()
+    overall_profit_margin = (overall_profit / overall_sales) * 100 if overall_sales != 0 else 0
+
+    # Show the delta value for profit margin compared to overall profit margin
+    st.metric("Overall Profit Margin (%)", f"{profit_margin:.2f}%", delta=f"{(profit_margin - overall_profit_margin):.2f}%")
+else:
+    st.write("Please select at least one subcategory to view the data.")
+
 
 
 
