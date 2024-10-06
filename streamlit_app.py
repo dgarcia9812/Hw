@@ -48,5 +48,12 @@ options = st.multiselect(
 
 st.write("You selected:", options)
 
-
-
+# (3) Line chart of sales for the selected items in (2)
+if options:
+        filtered_sub_df = filtered_df[filtered_df["Sub-Category"].isin(options)]
+        if not filtered_sub_df.empty:
+            st.write("### Sales Trend Visualization")
+            filtered_sub_df["Order_Date"] = pd.to_datetime(filtered_sub_df["Order_Date"])
+            filtered_sub_df.set_index('Order_Date', inplace=True)
+            sales_by_month_filtered = filtered_sub_df.filter(items=['Sales']).groupby(pd.Grouper(freq='MS')).sum()
+            st.line_chart(sales_by_month_filtered, y="Sales")
