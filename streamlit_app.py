@@ -54,6 +54,8 @@ st.write("You selected:", options)
 # Filter the data based on selected category and subcategories
 filtered_data = df[(df['Category'] == option) & (df['Sub_Category'].isin(options))]
 
+st.write(filtered_data)
+
 
 
 
