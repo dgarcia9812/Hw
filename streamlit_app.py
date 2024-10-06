@@ -36,6 +36,7 @@ st.write("### (3) show a line chart of sales for the selected items in (2)")
 st.write("### (4) show three metrics (https://docs.streamlit.io/library/api-reference/data/st.metric) for the selected items in (2): total sales, total profit, and overall profit margin (%)")
 st.write("### (5) use the delta option in the overall profit margin metric to show the difference between the overall average profit margin (all products across all categories)")
 
+
 # (1) Add a dropdown for Category
 option = st.selectbox(
     "Which category would you like?",
@@ -47,7 +48,11 @@ if option:
     filtered_df = df[df["Category"] == option]
 
     # (2) Add a multi-select for Sub_Category in the selected Category
-    sub_categories = filtered_df["Sub-Category"].unique()
+    sub_categories = [
+        "Chairs", "Tables", "Binders", "Accessories",
+        "Bookcase", "Furnishings", "Envelopes", "Art", 
+        "Papers", "Phones"
+    ]
     options = st.multiselect(
         "What is the subcategory?",
         sub_categories
