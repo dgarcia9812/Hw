@@ -62,6 +62,17 @@ if not filtered_data.empty:
     sales_by_month_filtered = filtered_data.filter(items=['Sales']).groupby(pd.Grouper(freq='M')).sum()
     st.line_chart(sales_by_month_filtered, y="Sales")
 
+  # 4 - Metrics for selected subcategories: Total Sales, Total Profit, and Profit Margin
+    total_sales = filtered_data['Sales'].sum()
+    total_profit = filtered_data['Profit'].sum()
+    profit_margin = (total_profit / total_sales) * 100 if total_sales != 0 else 0
+
+    st.write("### Metrics for Selected Sub_Categories")
+    st.metric("Total Sales", f"${total_sales:,.2f}")
+    st.metric("Total Profit", f"${total_profit:,.2f}")
+    st.metric("Profit Margin (%)", f"{profit_margin:.2f}%")
+
+
 
 
 
