@@ -61,7 +61,6 @@ st.write(filtered_data)
 # Section: Sales Trend Visualization
 st.write("### Sales Trend Visualization")
 if not filtered_data.empty:
-    filtered_data["Order_Date"] = pd.to_datetime(filtered_data["Order_Date"])
     filtered_data.set_index('Order_Date', inplace=True)
     sales_by_month_filtered = filtered_data.filter(items=['Sales']).groupby(pd.Grouper(freq='M')).sum()
     st.line_chart(sales_by_month_filtered, y="Sales")
