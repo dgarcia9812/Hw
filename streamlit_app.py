@@ -38,22 +38,29 @@ st.write("### (5) use the delta option in the overall profit margin metric to sh
 
 
 
-# Dropdown for Category
-category_selected = st.selectbox('Select a Category', df['Category'].unique())
+# Question 1: Category selection
+option = st.selectbox(
+    "Which category would you like?",
+    ("Furniture", "Office Supplies", "Technology"),
+)
 
-# Multiselect for Sub_Category based on selected Category
-subcategories = df[df['Category'] == category_selected]['Sub_Category'].unique()
-subcategories_selected = st.multiselect('Select Sub_Categories', subcategories)
+# Question 2: Subcategory multiselect
+options = st.multiselect(
+    "What is the subcategory?",
+    ["Chairs", "Tables", "Binders", "Accessories","Bookcase", "Furnishings", "Envelopes", "Art", "Papers", "Phones"],
+)
 
-# Filter data based on selected subcategories
-filtered_data = df[(df['Category'] == category_selected) & (df['Sub_Category'].isin(subcategories_selected))]
+st.write("You selected:", options)
 
-# Show line chart of sales for the selected items
+# Filter the data based on selected category and subcategories
+filtered_data = df[(df['Category'] == option) & (df['Sub_Category'].isin(options))]
+
+# Question 3: Line chart of sales for the selected items
 if not filtered_data.empty:
     filtered_sales_by_month = filtered_data.groupby(pd.Grouper(key='Order_Date', freq='M')).sum()
-    st.line_chart(filtered_sales_by_month['Sales'])
+    st.line_chart(filtered_sales_by_month['Sales'], y="Sales")
 
-    # Show metrics: total sales, total profit, and profit margin
+    # Question 4: Show metrics - total sales, total profit, and profit margin
     total_sales = filtered_data['Sales'].sum()
     total_profit = filtered_data['Profit'].sum()
     profit_margin = (total_profit / total_sales) * 100 if total_sales != 0 else 0
@@ -63,26 +70,14 @@ if not filtered_data.empty:
     st.metric("Total Profit", f"${total_profit:,.2f}")
     st.metric("Profit Margin (%)", f"{profit_margin:.2f}%")
 
-    # Calculate the overall profit margin across all categories for comparison
+    # Question 5: Overall profit margin delta
     overall_sales = df['Sales'].sum()
     overall_profit = df['Profit'].sum()
     overall_profit_margin = (overall_profit / overall_sales) * 100
 
-    # Show the delta value
+    # Show the delta value for profit margin
     st.metric("Overall Profit Margin (%)", f"{profit_margin:.2f}%", delta=f"{(profit_margin - overall_profit_margin):.2f}%")
 else:
     st.write("Please select at least one subcategory to view the data.")
-
-# Displaying the aggregation of sales by Category
-st.dataframe(df.groupby("Category").sum())
-st.bar_chart(df.groupby("Category", as_index=False).sum(), x="Category", y="Sales", color="#04f")
-
-# Aggregating sales by month
-df["Order_Date"] = pd.to_datetime(df["Order_Date"])
-df.set_index('Order_Date', inplace=True)
-sales_by_month = df.filter(items=['Sales']).groupby(pd.Grouper(freq='M')).sum()
-
-st.dataframe(sales_by_month)
-st.line_chart(sales_by_month, y="Sales")
 
 
