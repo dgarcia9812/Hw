@@ -37,52 +37,52 @@ st.write("### (4) show three metrics (https://docs.streamlit.io/library/api-refe
 st.write("### (5) use the delta option in the overall profit margin metric to show the difference between the overall average profit margin (all products across all categories)")
 
 
-# (1) Dropdown for Category
-category = st.selectbox(
-    "Which category would you like?",
-    ("Furniture", "Office Supplies", "Technology"),
-)
 
-st.write("You selected:", category)
+# Dropdown for Category
+category_selected = st.selectbox('Select a Category', df['Category'].unique())
 
-# Filter the dataframe based on the selected category
-filtered_df = df[df["Category"] == category]
+# Multiselect for Sub_Category based on selected Category
+subcategories = df[df['Category'] == category_selected]['Sub_Category'].unique()
+subcategories_selected = st.multiselect('Select Sub_Categories', subcategories)
 
-# (2) Multi-select for Sub_Category in the selected Category
-sub_categories = st.multiselect(
-    "What is the subcategory?",
-    ["Chairs", "Tables", "Binders", "Accessories","Bookcase", "Furnishings", "Envelopes", "Art", "Papers", "Phones"]
-)
+# Filter data based on selected subcategories
+filtered_data = df[(df['Category'] == category_selected) & (df['Sub_Category'].isin(subcategories_selected))]
 
-st.write("You selected:", sub_categories)
+# Show line chart of sales for the selected items
+if not filtered_data.empty:
+    filtered_sales_by_month = filtered_data.groupby(pd.Grouper(key='Order_Date', freq='M')).sum()
+    st.line_chart(filtered_sales_by_month['Sales'])
 
-# (3) Line chart of sales for selected sub-categories
-if sub_categories:
-    filtered_sub_df = filtered_df[filtered_df["Sub-Category"].isin(sub_categories)]
-    if not filtered_sub_df.empty:
-        st.write("### Sales Trend Visualization")
-        filtered_sub_df["Order_Date"] = pd.to_datetime(filtered_sub_df["Order_Date"])
-        filtered_sub_df.set_index('Order_Date', inplace=True)
-        sales_by_month_filtered = filtered_sub_df.filter(items=['Sales']).groupby(pd.Grouper(freq='M')).sum()
-        st.line_chart(sales_by_month_filtered, y="Sales")
-        
-        # (4) Show three metrics for the selected items in (2)
-        total_sales = filtered_sub_df["Sales"].sum()
-        total_profit = filtered_sub_df["Profit"].sum()
-        overall_profit_margin = (total_profit / total_sales) * 100
+    # Show metrics: total sales, total profit, and profit margin
+    total_sales = filtered_data['Sales'].sum()
+    total_profit = filtered_data['Profit'].sum()
+    profit_margin = (total_profit / total_sales) * 100 if total_sales != 0 else 0
 
-        st.metric("Total Sales", f"${total_sales:,.2f}")
-        st.metric("Total Profit", f"${total_profit:,.2f}")
-        st.metric("Overall Profit Margin (%)", f"{overall_profit_margin:.2f}%")
+    st.write("### Metrics for Selected Sub_Categories")
+    st.metric("Total Sales", f"${total_sales:,.2f}")
+    st.metric("Total Profit", f"${total_profit:,.2f}")
+    st.metric("Profit Margin (%)", f"{profit_margin:.2f}%")
 
-        # (5) Use the delta option to show the difference between the overall average profit margin and the profit margin of the selected items
-        overall_total_sales = df["Sales"].sum()
-        overall_total_profit = df["Profit"].sum()
-        overall_avg_profit_margin = (overall_total_profit / overall_total_sales) * 100
+    # Calculate the overall profit margin across all categories for comparison
+    overall_sales = df['Sales'].sum()
+    overall_profit = df['Profit'].sum()
+    overall_profit_margin = (overall_profit / overall_sales) * 100
 
-        delta = overall_profit_margin - overall_avg_profit_margin
-        st.metric("Overall Profit Margin (%)", f"{overall_profit_margin:.2f}%", delta=f"{delta:.2f}%")
-    else:
-        st.write("No data available for the selected sub-categories.")
+    # Show the delta value
+    st.metric("Overall Profit Margin (%)", f"{profit_margin:.2f}%", delta=f"{(profit_margin - overall_profit_margin):.2f}%")
 else:
-    st.write("Please select sub-categories to display data.")
+    st.write("Please select at least one subcategory to view the data.")
+
+# Displaying the aggregation of sales by Category
+st.dataframe(df.groupby("Category").sum())
+st.bar_chart(df.groupby("Category", as_index=False).sum(), x="Category", y="Sales", color="#04f")
+
+# Aggregating sales by month
+df["Order_Date"] = pd.to_datetime(df["Order_Date"])
+df.set_index('Order_Date', inplace=True)
+sales_by_month = df.filter(items=['Sales']).groupby(pd.Grouper(freq='M')).sum()
+
+st.dataframe(sales_by_month)
+st.line_chart(sales_by_month, y="Sales")
+
+
